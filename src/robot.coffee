@@ -4,6 +4,7 @@ Path           = require 'path'
 HttpClient     = require 'scoped-http-client'
 {EventEmitter} = require 'events'
 async          = require 'async'
+bodyParser     = require  'body-parser'
 
 User = require './user'
 Brain = require './brain'
@@ -417,7 +418,6 @@ class Robot
     address = process.env.EXPRESS_BIND_ADDRESS or process.env.BIND_ADDRESS or '0.0.0.0'
 
     express = require 'express'
-    multipart = require 'connect-multiparty'
 
     app = express()
 
@@ -428,11 +428,8 @@ class Robot
     app.use express.basicAuth user, pass if user and pass
     app.use express.query()
 
-    app.use express.json()
-    app.use express.urlencoded()
-    # replacement for deprecated express.multipart/connect.multipart
-    # limit to 100mb, as per the old behavior
-    app.use multipart(maxFilesSize: 100 * 1024 * 1024)
+    app.use bodyParser.json()
+    app.use bodyParser.urlencoded({ extended: true })
 
     app.use express.static stat if stat
 
